@@ -5,6 +5,7 @@ import time
 from paho.mqtt import client as mqtt_client
 import minimalmodbus
 import yaml
+import os
 
 # Function to read config
 def read_yaml(file_path):
@@ -12,7 +13,7 @@ def read_yaml(file_path):
         return yaml.safe_load(f)
 
 # Read config
-config = read_yaml("config.yaml")
+config = read_yaml(os.path.dirname(os.path.realpath(__file__)) + "/config.yaml")
 
 # MQTT settings
 broker = config["mqtt"]["broker"]
