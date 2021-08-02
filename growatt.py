@@ -80,15 +80,18 @@ def publish(client):
             print(f"Send `{msg}` to topic `{topic}`")
         else:
             print(f"Failed to send message to topic {topic}")
-        total_output_kwh = instrument.read_register(27, 1, 4, False)  # Registernumber, number of decimals, function code, signed? 
-        msg = total_output_kwh
-        topic = topic_prefix + "/total_output_kwh"
-        result = client.publish(topic, msg)
-        status = result[0]
-        if status == 0:
-           print(f"Send `{msg}` to topic `{topic}`")
-        else:
-           print(f"Failed to send message to topic {topic}")
+        
+        # Only try to read register and send data to MQTT broker if the inverter is online
+        if online == True:
+            total_output_kwh = instrument.read_register(27, 1, 4, False)  # Registernumber, number of decimals, function code, signed? 
+            msg = total_output_kwh
+            topic = topic_prefix + "/total_output_kwh"
+            result = client.publish(topic, msg)
+            status = result[0]
+            if status == 0:
+               print(f"Send `{msg}` to topic `{topic}`")
+            else:
+               print(f"Failed to send message to topic {topic}")
         time.sleep(60)
 
 def run():
