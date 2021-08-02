@@ -1,0 +1,15 @@
+mqtt:
+  broker: 'localhost' #change me!
+  port: 1883
+  topic_prefix: 'growatt'
+  client_id: "growatt"
+  username: 'username' #change me!
+  password: 'secret' #change me!
+
+modbus:
+  port: /dev/ttyUSB0
+  baudrate: 9600 
+  bytesize: 8
+  stopbits: 1
+  timeout: 1
+
