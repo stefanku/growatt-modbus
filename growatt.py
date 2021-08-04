@@ -12,10 +12,10 @@ def read_yaml(file_path):
     with open(file_path, "r") as f:
         return yaml.safe_load(f)
 
-# Read config
+# Load config file
 config = read_yaml(os.path.dirname(os.path.realpath(__file__)) + "/config.yaml")
 
-# MQTT settings
+# MQTT settings (reading from config file
 broker = config["mqtt"]["broker"]
 port = config["mqtt"]["port"]
 topic_prefix = config["mqtt"]["topic_prefix"]
@@ -46,7 +46,7 @@ def connect_mqtt():
     client.connect(broker, port)
     return client
 
-# Initial setting of online variablele
+# Initial setting of online variable
 online = False
 
 # Publish messages
@@ -84,7 +84,8 @@ def publish(client):
         
         # Only try to read register and send data to MQTT broker if the inverter is online
         if online == True:
-            total_output_kwh = instrument.read_register(27, 1, 4, False)  # Registernumber, number of decimals, function code, signed? 
+            # Adding "Energy today H" and "Energy today L" in KhWh
+            total_output_kwh = instrument.read_register(27, 1, 4, False) + instrument.read_register(26, 1, 4, False)  # Registernumber, number of decimals, function code, signed? 
             msg = total_output_kwh
             topic = topic_prefix + "/total_output_kwh"
             result = client.publish(topic, msg)
@@ -93,7 +94,17 @@ def publish(client):
                print(f"Send `{msg}` to topic `{topic}`")
             else:
                print(f"Failed to send message to topic {topic}")
-        time.sleep(60)
+            # Adding "Output power (high)" and "Output power (low)" in W
+            current_output_w = instrument.read_register(11, 1, 4, False) + instrument.read_register(12, 1, 4, False)  # Registernumber,$
+            msg = current_output_w
+            topic = topic_prefix + "/current_ouput_w"
+            result = client.publish(topic, msg)
+            status = result[0]
+            if status == 0:
+               print(f"Send `{msg}` to topic `{topic}`")
+            else:
+               print(f"Failed to send message to topic {topic}")
+        time.sleep(10)
 
 def run():
     client = connect_mqtt()
