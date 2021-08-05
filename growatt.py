@@ -88,7 +88,7 @@ def publish(client):
             total_output_kwh = instrument.read_register(27, 1, 4, False) + instrument.read_register(26, 1, 4, False)  # Registernumber, number of decimals, function code, signed? 
             msg = total_output_kwh
             topic = topic_prefix + "/total_output_kwh"
-            result = client.publish(topic, msg)
+            result = client.publish(topic, msg, retain=True)
             status = result[0]
             if status == 0:
                print(f"Send `{msg}` to topic `{topic}`")
@@ -104,6 +104,16 @@ def publish(client):
                print(f"Send `{msg}` to topic `{topic}`")
             else:
                print(f"Failed to send message to topic {topic}")
+        else:
+            msg = "0"
+            topic = topic_prefix + "/current_ouput_w"
+            result = client.publish(topic, msg)
+            status = result[0]
+            if status == 0:
+               print(f"Send `{msg}` to topic `{topic}`")
+            else:
+               print(f"Failed to send message to topic {topic}")
+
         time.sleep(10)
 
 def run():
